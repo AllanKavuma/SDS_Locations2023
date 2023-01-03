@@ -1,5 +1,5 @@
 ---
-title: "Regional.Supervisor Site Allocations"
+title: "Service Delivery Supervisors Site Allocations"
 author: "ATC"
 date: "03 Jan 2023"
 output: html_document
@@ -75,7 +75,7 @@ leaflet(siteLocations) %>% addTiles() %>% addMarkers(group = siteLocations$REGIO
 ### *Click circle to view Site Name and Site ID*
 #### *Note: Different colour per supervisor*  
 
-```{r CircularPins, echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=12}
+```{r CircularPins, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
 #leaflet(siteLocations) %>% addTiles() %>% addMarkers(lat = siteLocations$Latitude, lng = siteLocations$Longitude) %>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
 leaflet(siteLocations) %>%
   addTiles() %>%
@@ -94,7 +94,7 @@ leaflet(siteLocations) %>%
 
 ### *Click circle to view details of Site Name, Site ID and Supervisor*  
 #### *Note: Different colour per supervisor*  
-```{r testing, fig.width=12, fig.height=8, echo=FALSE, message=FALSE, warning=FALSE}
+```{r testing, fig.width=10, fig.height=10, echo=FALSE, message=FALSE, warning=FALSE}
 # fig.width=12, fig.height=8
 pal <- colorFactor(
   palette = c('brown','dark green', 'pink','yellow','green', 'blue', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
@@ -120,7 +120,7 @@ groupOptions("detail", zoomLevels = 7:18)
 ```
 
 # IEngineering Site Locations
-```{r CircularPinsIEng, echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=12}
+```{r CircularPinsIEng, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
 #leaflet(siteLocations) %>% addTiles() %>% addMarkers(lat = siteLocations$Latitude, lng = siteLocations$Longitude) %>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
 ## filter only IEngineering sites
 siteLocations_IEng <- siteLocations[siteLocations$SDM == c("Allan Kavuma"),]
