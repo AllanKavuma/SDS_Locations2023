@@ -1,0 +1,143 @@
+---
+title: "Regional.Supervisor Site Allocations"
+author: "ATC"
+date: "03 Jan 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r LoadLibraries, echo=FALSE, message=FALSE, warning=FALSE}
+## Import Libraries
+library(leaflet) ## Creating leaftlet map
+library(xlsx) ## For reading excel file
+library(dplyr) ## For data manipulation
+```
+
+
+# All Sites
+   
+
+```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center"}
+## Read the data
+## Read the site data
+sitedata <- read.xlsx("New site distribution - 2023.xlsx", sheetName = "Sheet1")
+
+#str(sitedata)
+## Clean the data
+## Select the rows for the Latitudes, Longitudes and Region
+siteLocations <- sitedata[,c("SITE.ID", "SITE.NAME", 
+                             "Lat", "Long", "CONTRACTOR", "REGIONAL.SUPERVISOR", "SDM")]
+## Remove missing values data
+#siteLocations <- na.omit(siteLocations)
+# Check if all missing values are removed
+#table(is.na(siteLocations))
+# Check the structure of the data frame
+#str(siteLocations)
+# Change Name variable from Factor to character type
+siteLocations$SITE.NAME <- as.character(siteLocations$SITE.NAME)
+siteLocations$REGIONAL.SUPERVISOR <- as.factor(siteLocations$REGIONAL.SUPERVISOR)
+
+## Remove NAs
+siteLocations <- na.omit(siteLocations)
+## Remove wrong value of Mutara_House
+#siteLocations <- siteLocations[!(siteLocations$ATC.Site.Name == c("Mutara_House")),]
+
+# Setting your own colors manually:
+pal <- colorFactor(
+  palette = c("blue", "red", "green"),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocations$REGIONAL.SUPERVISOR
+)
+
+#pal <- colorFactor(
+#  palette = 'Dark2',
+#  domain = siteLocations$Allocation)
+
+## Plot the map
+## Plot map according to the regions of the sites
+leaflet(siteLocations) %>% addTiles() %>% addMarkers(group = siteLocations$REGIONAL.SUPERVISOR, lat = siteLocations$Lat, lng = siteLocations$Long, popup = paste("SiteName:" = siteLocations$SITE.NAME, "</br>",
+                                                                                                                              "SiteID:" = siteLocations$SITE.ID,
+                                                                                                                              "</br>",
+                                                                                                                              "SDS: " = siteLocations$REGIONAL.SUPERVISOR,
+                                                                                                                              "</br>",
+                                                                                                                              "SDM:" = siteLocations$SDM,
+                                                                                                                              "</br>",
+                                                                                                                              "SMPMS:" = siteLocations$CONTRACTOR
+                                                                                                                              ), clusterOptions = markerClusterOptions())
+
+```
+
+# Circular Pins  
+
+### *Click circle to view Site Name and Site ID*
+#### *Note: Different colour per supervisor*  
+
+```{r CircularPins, echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=12}
+#leaflet(siteLocations) %>% addTiles() %>% addMarkers(lat = siteLocations$Latitude, lng = siteLocations$Longitude) %>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+leaflet(siteLocations) %>%
+  addTiles() %>%
+  addCircles(lat = siteLocations$Lat, lng = siteLocations$Long, weight = 1, 
+              popup = paste("SiteName:" = siteLocations$SITE.NAME, "</br>",                                                      "SiteID:" = siteLocations$SITE.ID, "</br>", 
+                            "SDS:" = siteLocations$REGIONAL.SUPERVISOR, "</br>",
+                            "SDM:" = siteLocations$SDM, "</br>",
+                            "SMPMS:" = siteLocations$CONTRACTOR), 
+             color = ~pal(REGIONAL.SUPERVISOR), radius = 3000) %>%
+    addLegend(pal = pal, values = ~siteLocations$REGIONAL.SUPERVISOR, group = "circles", position = "bottomright")
+#addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+```
+
+
+# Pins for sites  
+
+### *Click circle to view details of Site Name, Site ID and Supervisor*  
+#### *Note: Different colour per supervisor*  
+```{r testing, fig.width=12, fig.height=8, echo=FALSE, message=FALSE, warning=FALSE}
+# fig.width=12, fig.height=8
+pal <- colorFactor(
+  palette = c('brown','dark green', 'pink','yellow','green', 'blue', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocations$REGIONAL.SUPERVISOR
+)
+leaflet() %>%
+# Basic markers
+addTiles(group = "basic") %>%
+addMarkers(data = siteLocations, group = "basic", popup = paste("SiteName:" = siteLocations$SITE.NAME, "</br>",                                                                                        "SiteID:" = siteLocations$SITE.ID,
+                        "</br>",                                                                                        "Supervisor:" = siteLocations$REGIONAL.SUPERVISOR,
+                        "</br>",
+                        "SDM:" = siteLocations$SDM,
+                        "</br>",
+                        "SMPMS:" = siteLocations$CONTRACTOR
+                                                                )) %>%
+# When zoomed in, we'll show circles at the base of each marker whose
+# radius and color reflect the magnitude
+addProviderTiles(providers$Stamen.TonerLite, group = "detail") %>%
+addCircleMarkers(data = siteLocations, group = "detail", fillOpacity = 0.5,
+radius = 2.5, color = ~pal(REGIONAL.SUPERVISOR), stroke = FALSE) %>%
+# Set the detail group to only appear when zoomed in
+groupOptions("detail", zoomLevels = 7:18)
+```
+
+# IEngineering Site Locations
+```{r CircularPinsIEng, echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=12}
+#leaflet(siteLocations) %>% addTiles() %>% addMarkers(lat = siteLocations$Latitude, lng = siteLocations$Longitude) %>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+## filter only IEngineering sites
+siteLocations_IEng <- siteLocations[siteLocations$SDM == c("Allan Kavuma"),]
+
+pal <- colorFactor(
+  palette = c("blue", "red", "green", "black", "purple"),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocations_IEng$REGIONAL.SUPERVISOR
+)
+
+leaflet(siteLocations_IEng) %>%
+  addTiles() %>%
+  addCircles(lat = siteLocations_IEng$Lat, lng = siteLocations_IEng$Long, weight = 1, 
+              popup = paste("SiteName:" = siteLocations_IEng$SITE.NAME, "</br>",                                                      "SiteID:" = siteLocations_IEng$SITE.ID, "</br>", 
+                            "SDS:" = siteLocations_IEng$REGIONAL.SUPERVISOR, "</br>",
+                            "SDM:" = siteLocations_IEng$SDM, "</br>",
+                            "SMPMS:" = siteLocations_IEng$CONTRACTOR), 
+             color = ~pal(REGIONAL.SUPERVISOR), radius = 3000) %>%
+    addLegend(pal = pal, values = ~siteLocations_IEng$REGIONAL.SUPERVISOR, group = "circles", position = "bottomright")
+#addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+```
