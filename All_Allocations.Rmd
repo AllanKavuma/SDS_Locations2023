@@ -24,7 +24,7 @@ library(dplyr) ## For data manipulation
 ```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center"}
 ## Read the data
 ## Read the site data
-sitedata <- read.xlsx("New site distribution - 2023.xlsx", sheetName = "Sheet1")
+sitedata <- read.xlsx("New site distribution_1 - 2025.xlsx", sheetName = "Sheet1")
 
 #str(sitedata)
 ## Clean the data
@@ -40,6 +40,7 @@ siteLocations <- sitedata[,c("SITE.ID", "SITE.NAME",
 # Change Name variable from Factor to character type
 siteLocations$SITE.NAME <- as.character(siteLocations$SITE.NAME)
 siteLocations$REGIONAL.SUPERVISOR <- as.factor(siteLocations$REGIONAL.SUPERVISOR)
+siteLocations$CONTRACTOR <- as.factor(siteLocations$CONTRACTOR)
 
 ## Remove NAs
 siteLocations <- na.omit(siteLocations)
@@ -88,7 +89,27 @@ leaflet(siteLocations) %>%
     addLegend(pal = pal, values = ~siteLocations$REGIONAL.SUPERVISOR, group = "circles", position = "bottomright")
 #addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
 ```
+# 2025 Site Allocation Proposal
 
+
+```{r CircularPinsVendor, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+
+# Setting your own colors manually:
+pal <- colorFactor(
+  palette = c("blue", "red", "green"),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocations$CONTRACTOR
+)
+
+leaflet(siteLocations) %>%
+  addTiles() %>%
+  addCircles(lat = siteLocations$Lat, lng = siteLocations$Long, weight = 1, 
+              popup = paste("SiteName:" = siteLocations$SITE.NAME, "</br>",                                                      "SiteID:" = siteLocations$SITE.ID, "</br>", 
+                            "SDS:" = siteLocations$REGIONAL.SUPERVISOR, "</br>",
+                            "SDM:" = siteLocations$SDM, "</br>",
+                            "SMPMS:" = siteLocations$CONTRACTOR), 
+             color = ~pal(CONTRACTOR), radius = 3000) %>%
+    addLegend(pal = pal, values = ~siteLocations$CONTRACTOR, group = "circles", position = "bottomright")
+```
 
 # Pins for sites  
 
@@ -137,7 +158,7 @@ leaflet(siteLocations_IEng) %>%
                             "SDS:" = siteLocations_IEng$REGIONAL.SUPERVISOR, "</br>",
                             "SDM:" = siteLocations_IEng$SDM, "</br>",
                             "SMPMS:" = siteLocations_IEng$CONTRACTOR), 
-             color = ~pal(REGIONAL.SUPERVISOR), radius = 3000) %>%
+             color = ~pal(REGIONAL.SUPERVISOR), radius = 2.5) %>%
     addLegend(pal = pal, values = ~siteLocations_IEng$REGIONAL.SUPERVISOR, group = "circles", position = "bottomright")
 #addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
 ```
