@@ -2,7 +2,9 @@
 title: "Service Delivery Supervisors Site Allocations"
 author: "ATC"
 date: "02 Sept 2024"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +26,7 @@ library(dplyr) ## For data manipulation
 ```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center"}
 ## Read the data
 ## Read the site data
-sitedata <- read.xlsx("New site distribution_1 - 2025.xlsx", sheetName = "Sheet1")
+sitedata <- read.xlsx("New site distribution_1 - 2025_v3.xlsx", sheetName = "Sheet1")
 
 #str(sitedata)
 ## Clean the data
